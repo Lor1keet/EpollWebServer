@@ -3,28 +3,27 @@
 #include<arpa/inet.h>
 #include<string.h>
 #include<unistd.h>
-#include"util.h"
+#include "util.h"
+#include "Epoll.h"
+#include "InetAddress.h"
+#include "Socket.h"
 
 int main(){
-    int sockfd = socket(AF_INET, SOCK_STREAM, 0);
-    struct sockaddr_in serv_addr;
-    bzero(&serv_addr, sizeof(serv_addr));
-    serv_addr.sin_family = AF_INET;
-    serv_addr.sin_port = htons(8888);
-    serv_addr.sin_addr.s_addr = inet_addr("127.0.0.1");
-    errif(connect(sockfd, (sockaddr*)&serv_addr, sizeof(serv_addr)) == -1, "socket connect error");
+    Socket *sockfd = new Socket();
+    InetAddress *server_addr = new InetAddress("127.0.0.1", 8888);
+    errif(connect(sockfd->getFd(), (sockaddr*)&server_addr->addr, server_addr->addr_len) == -1, "socket connect error");
 
     while(true){
         char buf[1024];
         bzero(&buf, sizeof(buf));
         scanf("%s", buf);
-        ssize_t write_bytes = write(sockfd, buf, sizeof(buf));
+        ssize_t write_bytes = write(sockfd->getFd(), buf, sizeof(buf));
         if (write_bytes == -1){
             printf("disconnected");
             break;
         }
         bzero(&buf, sizeof(buf));
-        ssize_t read_bytes = read(sockfd, buf, sizeof(buf));
+        ssize_t read_bytes = read(sockfd->getFd(), buf, sizeof(buf));
         if (read_bytes > 0){
             printf("message from server: %s\n", buf);
         }
@@ -33,10 +32,10 @@ int main(){
             break;
         }
         else if(read_bytes == -1){
-            close(sockfd);
+            close(sockfd->getFd());
             errif(true, "socket read error");
         }
     }
-    close(sockfd);
+    close(sockfd->getFd());
     return 0;
 }

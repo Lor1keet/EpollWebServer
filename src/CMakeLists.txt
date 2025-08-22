@@ -1,4 +1,10 @@
 add_library(common_lib STATIC
+    Epoll.cpp
+    Epoll.h
+    InetAddress.cpp
+    InetAddress.h
+    Socket.cpp
+    Socket.h
     util.cpp
     util.h
 )
