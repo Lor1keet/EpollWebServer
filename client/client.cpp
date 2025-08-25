@@ -8,10 +8,14 @@
 #include "InetAddress.h"
 #include "Socket.h"
 
+#include "Log.h"
+
 int main(){
     Socket *sockfd = new Socket();
     InetAddress *server_addr = new InetAddress("127.0.0.1", 8888);
     errif(connect(sockfd->getFd(), (sockaddr*)&server_addr->addr, server_addr->addr_len) == -1, "socket connect error");
+
+    LOG_INFO("client is running");
 
     while(true){
         char buf[1024];
