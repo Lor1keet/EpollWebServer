@@ -1,14 +1,11 @@
 project(common_lib)
+set(CMAKE_CXX_STANDARD 20)
+file(GLOB COMMON_SOURCES "*.cpp")
+file(GLOB COMMON_HEADERS "*.h")
 
 add_library(common_lib STATIC
-    Epoll.cpp
-    Epoll.h
-    InetAddress.cpp
-    InetAddress.h
-    Socket.cpp
-    Socket.h
-    util.cpp
-    util.h
+    ${COMMON_SOURCES}
+    ${COMMON_HEADERS}
 )
 
 target_include_directories(common_lib PUBLIC 

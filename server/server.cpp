@@ -9,6 +9,8 @@
 #include "InetAddress.h"
 #include "Socket.h"
 
+#include "Log.h"
+
 #define MAX_EVENTS 1024
 #define READ_BUFFER 1024
 
@@ -25,6 +27,8 @@ int main(){
     Epoll *ep = new Epoll();
     server_sock->setnonblocking();
     ep->addFd(server_sock->getFd(), EPOLLIN | EPOLLET); // 将server_sock的fd添加到epoll
+
+    LOG_INFO("server is running");
 
     while(true){
         std::vector<epoll_event> events = ep->poll(); // epoll等待事件
