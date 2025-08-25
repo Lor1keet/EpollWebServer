@@ -1,0 +1,6 @@
+[submodule "3rd/asio"]
+	path = 3rd/asio
+	url = https://github.com/chriskohlhoff/asio.git
+[submodule "3rd/spdlog"]
+	path = 3rd/spdlog
+	url = https://github.com/gabime/spdlog.git
