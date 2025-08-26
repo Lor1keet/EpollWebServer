@@ -1,45 +1,56 @@
-#include<stdio.h>
-#include<sys/socket.h>
-#include<arpa/inet.h>
-#include<string.h>
-#include<unistd.h>
-#include "util.h"
-#include "Epoll.h"
-#include "InetAddress.h"
-#include "Socket.h"
+﻿#include <iostream>
+#include <asio.hpp>
+#include <string>
+#include <cstring>
 
 #include "Log.h"
 
-int main(){
-    Socket *sockfd = new Socket();
-    InetAddress *server_addr = new InetAddress("127.0.0.1", 8888);
-    errif(connect(sockfd->getFd(), (sockaddr*)&server_addr->addr, server_addr->addr_len) == -1, "socket connect error");
+using asio::ip::tcp;
 
-    LOG_INFO("client is running");
+int main()
+{
+    asio::io_context io_context;
 
-    while(true){
+    tcp::resolver resolver(io_context);
+    auto endpoint = resolver.resolve("127.0.0.1","8888");
+
+    tcp::socket socket(io_context);
+    asio::connect(socket, endpoint);
+
+    LOG_INFO("connected to server");
+
+    while(true)
+    {
         char buf[1024];
-        bzero(&buf, sizeof(buf));
-        scanf("%s", buf);
-        ssize_t write_bytes = write(sockfd->getFd(), buf, sizeof(buf));
-        if (write_bytes == -1){
-            printf("disconnected");
+        std::memset(buf, 0, sizeof(buf));
+
+        std::cout << "input message: ";
+        std::cin >> buf;
+
+        size_t write_bytes = asio::write(socket, asio::buffer(buf, strlen(buf)));
+        LOG_INFO("write {} bytes to server", write_bytes);
+
+        std::memset(buf, 0, sizeof(buf));
+
+        size_t read_bytes = asio::read(socket, asio::buffer(buf, write_bytes));
+
+        LOG_INFO("read {} bytes from server: {}", read_bytes, buf);
+
+        if (read_bytes > 0)
+        {
+            LOG_INFO("server echo: {}", buf);
+        }
+        else if (read_bytes == 0)
+        {
+            LOG_WARN("server closed");
             break;
         }
-        bzero(&buf, sizeof(buf));
-        ssize_t read_bytes = read(sockfd->getFd(), buf, sizeof(buf));
-        if (read_bytes > 0){
-            printf("message from server: %s\n", buf);
-        }
-        else if(read_bytes == 0){
-            printf("server socket disconnected!\n");
+        else
+        {
+            LOG_ERROR("read error");
             break;
-        }
-        else if(read_bytes == -1){
-            close(sockfd->getFd());
-            errif(true, "socket read error");
         }
     }
-    close(sockfd->getFd());
+    socket.close();
     return 0;
 }
