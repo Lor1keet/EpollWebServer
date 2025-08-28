@@ -1,0 +1,45 @@
+name: CMake Build
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build:
+    name: Build on ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      with:
+        submodules: 'recursive'  # 递归拉取所有submodule
+
+    - name: Configure CMake
+      # 为不同平台设置不同的构建目录和生成器
+      run: |
+        mkdir -p build
+        cd build
+        if [[ "${{ matrix.os }}" == "windows-latest" ]]; then
+          cmake .. -G "Visual Studio 17 2022"
+        else
+          cmake .. -DCMAKE_BUILD_TYPE=Release
+        fi
+      shell: bash
+
+    - name: Build
+      # 根据不同平台使用不同的构建命令
+      run: |
+        cd build
+        if [[ "${{ matrix.os }}" == "windows-latest" ]]; then
+          cmake --build . --config Release
+        else
+          make -j$(nproc)
+        fi
+      shell: bash
