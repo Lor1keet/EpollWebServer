@@ -1,11 +1,29 @@
 project(common_lib)
-set(CMAKE_CXX_STANDARD 20)
-file(GLOB COMMON_SOURCES "*.cpp")
-file(GLOB COMMON_HEADERS "*.h")
+
+set(COMMON_SOURCES
+    util.cpp
+)
+
+if(WIN32)
+    set(PLATFORM_SOURCES
+    )
+elseif(UNIX) 
+    set(PLATFORM_SOURCES
+        Epoll.cpp
+        InetAddress.cpp
+        Socket.cpp
+    )
+else()
+    message(FATAL_ERROR "不支持的操作系统")
+endif()
+
+set(ALL_SOURCES
+    ${COMMON_SOURCES}
+    ${PLATFORM_SOURCES}
+)
 
 add_library(common_lib STATIC
-    ${COMMON_SOURCES}
-    ${COMMON_HEADERS}
+    ${ALL_SOURCES}
 )
 
 target_include_directories(common_lib PUBLIC 
