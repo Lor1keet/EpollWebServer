@@ -9,9 +9,10 @@ if(WIN32)
     )
 elseif(UNIX) 
     set(PLATFORM_SOURCES
-        Epoll.cpp
-        InetAddress.cpp
-        Socket.cpp
+        Epoll/Epoll.cpp
+        InetAddress/InetAddress.cpp
+        Socket/Socket.cpp
+        http/http.cpp
     )
 else()
     message(FATAL_ERROR "不支持的操作系统")
