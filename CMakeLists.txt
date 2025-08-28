@@ -4,8 +4,10 @@ project(NetworkProject)
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall /utf-8")
-
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall")
+if(WIN32 AND MSVC)
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /utf-8")
+endif()
 include_directories(
     ${CMAKE_SOURCE_DIR}/common_lib
     ${CMAKE_SOURCE_DIR}/3rd/spdlog/include
